@@ -141,37 +141,40 @@ export function AppProvider({ children }) {
   }, [state.user, state.subscriptions, state.emails]);
 
   const loadInitialData = async () => {
-    dispatch({ type: ACTIONS.SET_LOADING, payload: true });
+  dispatch({ type: ACTIONS.SET_LOADING, payload: true });
+  
+  try {
+    // Load default data first (pentru immediate UI)
+    const defaultSubscriptions = subscriptionsService.getDefaultSubscriptions();
+    const defaultEmails = emailsService.getDefaultEmails();
     
-    try {
-      // Load from localStorage first
-      const savedState = localStorageService.getAppState();
-      if (savedState) {
-        dispatch({ type: ACTIONS.UPDATE_USER, payload: savedState.user });
-        dispatch({ type: ACTIONS.SET_SUBSCRIPTIONS, payload: savedState.subscriptions });
-        dispatch({ type: ACTIONS.SET_EMAILS, payload: savedState.emails });
-      } else {
-        // Load default data
-        const subscriptions = subscriptionsService.getDefaultSubscriptions();
-        const emails = emailsService.getDefaultEmails();
-        dispatch({ type: ACTIONS.SET_SUBSCRIPTIONS, payload: subscriptions });
-        dispatch({ type: ACTIONS.SET_EMAILS, payload: emails });
-      }
-      
-      // Generate insights based on loaded data
-      const insights = analyticsCalculator.generateInsights(
-        state.subscriptions.length > 0 ? state.subscriptions : subscriptionsService.getDefaultSubscriptions(),
-        state.emails.length > 0 ? state.emails : emailsService.getDefaultEmails(),
-        state.user
-      );
-      dispatch({ type: ACTIONS.SET_INSIGHTS, payload: insights });
-      
-    } catch (error) {
-      console.error('Error loading initial data:', error);
-    } finally {
-      dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+    // Load from localStorage second (pentru saved state)
+    const savedState = localStorageService.getAppState();
+    if (savedState && savedState.subscriptions && savedState.subscriptions.length > 0) {
+      dispatch({ type: ACTIONS.UPDATE_USER, payload: savedState.user });
+      dispatch({ type: ACTIONS.SET_SUBSCRIPTIONS, payload: savedState.subscriptions });
+      dispatch({ type: ACTIONS.SET_EMAILS, payload: savedState.emails });
+    } else {
+      // Use defaults if no saved state
+      dispatch({ type: ACTIONS.SET_SUBSCRIPTIONS, payload: defaultSubscriptions });
+      dispatch({ type: ACTIONS.SET_EMAILS, payload: defaultEmails });
     }
-  };
+    
+    // Always generate fresh insights
+    const currentSubscriptions = savedState?.subscriptions || defaultSubscriptions;
+    const currentEmails = savedState?.emails || defaultEmails;
+    const insights = analyticsCalculator.generateInsights(currentSubscriptions, currentEmails, state.user);
+    dispatch({ type: ACTIONS.SET_INSIGHTS, payload: insights });
+    
+  } catch (error) {
+    console.error('Error loading initial data:', error);
+    // Fallback to defaults on error
+    dispatch({ type: ACTIONS.SET_SUBSCRIPTIONS, payload: subscriptionsService.getDefaultSubscriptions() });
+    dispatch({ type: ACTIONS.SET_EMAILS, payload: emailsService.getDefaultEmails() });
+  } finally {
+    dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+  }
+};
 
   // Action creators
   const actions = {
