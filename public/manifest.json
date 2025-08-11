@@ -1,0 +1,23 @@
+{
+  "name": "CleanSlate v3 - Subscription Manager",
+  "short_name": "CleanSlate",
+  "description": "AI-powered subscription and email management app",
+  "theme_color": "#2563eb",
+  "background_color": "#f8f9fa",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
