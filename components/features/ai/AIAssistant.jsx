@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  Bot, Send, X, Minimize2, Maximize2, Lightbulb, 
-  TrendingUp, DollarSign, Mail, Target, Zap, MessageCircle 
+  Bot, Send, X, Minimize2, Maximize2, 
+  TrendingUp, DollarSign, Mail, Target,
 } from 'lucide-react';
 import { useApp } from '../../../context';
 import { useAnalytics } from '../../../hooks';
