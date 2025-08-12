@@ -69,6 +69,18 @@ function appReducer(state, action) {
     case ACTIONS.SET_EMAILS:
       return { ...state, emails: action.payload };
       
+   // Add to existing ACTIONS
+export const ACTIONS = {
+  // ... existing actions
+  UPDATE_EMAIL: 'UPDATE_EMAIL',
+  BULK_UNSUBSCRIBE_EMAILS: 'BULK_UNSUBSCRIBE_EMAILS',
+};
+
+// Add to reducer function
+function appReducer(state, action) {
+  switch (action.type) {
+    // ... existing cases
+    
     case ACTIONS.UPDATE_EMAIL:
       return {
         ...state,
@@ -76,6 +88,61 @@ function appReducer(state, action) {
           email.id === action.payload.id ? { ...email, ...action.payload.updates } : email
         )
       };
+      
+    case ACTIONS.BULK_UNSUBSCRIBE_EMAILS:
+      return {
+        ...state,
+        emails: state.emails.map(email =>
+          action.payload.includes(email.id) ? { ...email, unsubscribed: true } : email
+        )
+      };
+    
+    // ... rest of cases
+  }
+}
+
+// Add to actions object in AppProvider
+const actions = {
+  // ... existing actions
+  
+  // Email actions
+  unsubscribeEmail: (id) => {
+    dispatch({
+      type: ACTIONS.UPDATE_EMAIL,
+      payload: { id, updates: { unsubscribed: true } }
+    });
+    
+    // Show notification
+    const email = state.emails.find(e => e.id === id);
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('Email Unsubscribed', {
+        body: `Unsubscribed from ${email.sender}. You'll save time on email management!`,
+        icon: '/icons/icon-192x192.png'
+      });
+    }
+  },
+
+  resubscribeEmail: (id) => {
+    dispatch({
+      type: ACTIONS.UPDATE_EMAIL,
+      payload: { id, updates: { unsubscribed: false } }
+    });
+  },
+
+  bulkUnsubscribeEmails: (emailIds) => {
+    dispatch({ type: ACTIONS.BULK_UNSUBSCRIBE_EMAILS, payload: emailIds });
+    
+    // Show notification
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('Bulk Unsubscribe Complete', {
+        body: `Unsubscribed from ${emailIds.length} email sources. Your inbox will be much cleaner!`,
+        icon: '/icons/icon-192x192.png'
+      });
+    }
+  },
+  
+  // ... rest of actions
+};
       
     case ACTIONS.SET_INSIGHTS:
       return { ...state, insights: action.payload };
