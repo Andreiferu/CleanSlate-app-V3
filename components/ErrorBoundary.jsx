@@ -1,26 +1,27 @@
-import Link from 'next/link';
+import { Component } from 'react';
 
-export default function Layout({ children }) {
-  return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <header className="border-b bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
-          <Link href="/" className="font-semibold text-gray-900">CleanSlate</Link>
-          <nav className="flex items-center gap-4 text-sm text-gray-600">
-            <Link href="/">Home</Link>
-          </nav>
+export default class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, info) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('ErrorBoundary caught', error, info);
+    }
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-6 rounded-xl border bg-white">
+          <h2 className="text-lg font-semibold mb-2">Something went wrong.</h2>
+          <pre className="text-xs text-red-600 overflow-auto">{String(this.state.error)}</pre>
         </div>
-      </header>
-
-      <main className="flex-1">
-        <div className="mx-auto max-w-6xl px-4 py-6">{children}</div>
-      </main>
-
-      <footer className="border-t bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-4 text-xs text-gray-500">
-          © {new Date().getFullYear()} CleanSlate
-        </div>
-      </footer>
-    </div>
-  );
+      );
+    }
+    return this.props.children;
+  }
 }
