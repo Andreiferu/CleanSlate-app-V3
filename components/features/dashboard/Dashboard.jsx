@@ -2,6 +2,7 @@ import React from 'react';
 import { useAnalytics, useSubscriptions } from '../../../hooks';
 import { StatCard } from '../../ui';
 import { DollarSign, CreditCard, Mail, Target } from 'lucide-react';
+import AIAssistant from '../ai/AIAssistant';
 
 const Dashboard = React.memo(() => {
   const { analytics, formatCurrency } = useAnalytics();
@@ -53,33 +54,37 @@ const Dashboard = React.memo(() => {
         <div className="text-4xl mb-4">🎉</div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">CleanSlate v3 is Ready!</h2>
         <p className="text-gray-600 mb-4">
-          Modular architecture successfully implemented with:
+          Enhanced with AI assistance, advanced analytics, and comprehensive email management:
         </p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div className="bg-green-100 text-green-800 p-3 rounded-lg font-medium">
-            ✅ Context API
+            ✅ AI Assistant
           </div>
           <div className="bg-blue-100 text-blue-800 p-3 rounded-lg font-medium">
-            ✅ Custom Hooks
+            ✅ Advanced Analytics
           </div>
           <div className="bg-purple-100 text-purple-800 p-3 rounded-lg font-medium">
-            ✅ Modular Components
+            ✅ Email Management
           </div>
           <div className="bg-orange-100 text-orange-800 p-3 rounded-lg font-medium">
-            ✅ PWA Support
+            ✅ Smart Insights
           </div>
         </div>
         
         {prioritySubscriptions.length > 0 && (
           <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <h3 className="font-semibold text-yellow-800 mb-2">Priority Action Needed</h3>
+            <h3 className="font-semibold text-yellow-800 mb-2">🤖 AI Recommendation</h3>
             <p className="text-yellow-700 text-sm">
-              You have {prioritySubscriptions.length} unused subscriptions that could save you{' '}
+              I found {prioritySubscriptions.length} unused subscriptions that could save you{' '}
               ${prioritySubscriptions.reduce((sum, sub) => sum + sub.amount, 0).toFixed(2)}/month!
+              Ask the AI assistant below for personalized optimization tips.
             </p>
           </div>
         )}
       </div>
+
+      {/* AI Assistant - Always available on dashboard */}
+      <AIAssistant />
     </div>
   );
 });
