@@ -1,4 +1,45 @@
-class SubscriptionsService {
+import { BaseAPIService } from './base.js';
+
+class SubscriptionsService extends BaseAPIService {
+  constructor() {
+    super('/api');
+  }
+
+  async getSubscriptions() {
+    try {
+      return await this.request('/subscriptions');
+    } catch (error) {
+      console.error('Failed to fetch subscriptions:', error);
+      
+      // Fallback la date locale
+      console.warn('Using fallback data due to API error');
+      return this.getDefaultSubscriptions();
+    }
+  }
+
+  async updateSubscription(id, updates) {
+    try {
+      return await this.request(`/subscriptions/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(updates)
+      });
+    } catch (error) {
+      console.error('Failed to update subscription:', error);
+      throw error;
+    }
+  }
+
+  async cancelSubscription(id) {
+    try {
+      return await this.request(`/subscriptions/${id}/cancel`, {
+        method: 'POST'
+      });
+    } catch (error) {
+      console.error('Failed to cancel subscription:', error);
+      throw error;
+    }
+  }
+
   getDefaultSubscriptions() {
     return [
       { id: 1, name: 'Netflix', amount: 15.99, status: 'active', lastUsed: '2 days ago', category: 'Entertainment', logo: '🎬', nextBilling: '2025-08-15', yearlyDiscount: 0 },
