@@ -6,36 +6,28 @@ import { LoadingSpinner } from '../components/ui';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { Dashboard } from '../components/features/dashboard';
 import { SubscriptionsTab } from '../components/features/subscriptions';
+import { EmailsTab } from '../components/features/emails';
+import { AnalyticsTab } from '../components/features/analytics';
 
-// Simple content switcher for tabs
+// Content switcher with all new tabs
 function AppContent() {
   const { state } = useApp();
   const { activeTab } = state.ui;
 
- const renderContent = () => {
-  switch (activeTab) {
-    case 'dashboard':
-      return <Dashboard />;
-    case 'subscriptions':
-      return <SubscriptionsTab />;
-    case 'emails':
-      return (
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-2xl font-bold mb-4">Email Cleanup</h2>
-          <p>Email management coming soon in next phase!</p>
-        </div>
-      );
-    case 'analytics':
-      return (
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-2xl font-bold mb-4">Analytics</h2>
-          <p>Advanced analytics coming soon in next phase!</p>
-        </div>
-      );
-    default:
-      return <Dashboard />;
-  }
-};
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'dashboard':
+        return <Dashboard />;
+      case 'subscriptions':
+        return <SubscriptionsTab />;
+      case 'emails':
+        return <EmailsTab />;
+      case 'analytics':
+        return <AnalyticsTab />;
+      default:
+        return <Dashboard />;
+    }
+  };
 
   return (
     <main className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8" role="main">
@@ -50,8 +42,8 @@ function CleanSlateApp() {
   return (
     <>
       <Head>
-        <title>CleanSlate v3 - Digital Life Decluttering</title>
-        <meta name="description" content="Modular subscription and email management with smart analytics and AI recommendations." />
+        <title>CleanSlate v3 - AI-Powered Digital Life Optimization</title>
+        <meta name="description" content="Advanced subscription management, email cleanup, and AI-powered insights for digital decluttering." />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
         <meta name="theme-color" content="#3b82f6" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
