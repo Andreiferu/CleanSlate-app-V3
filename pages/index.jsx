@@ -6,10 +6,8 @@ import { LoadingSpinner } from '../components/ui';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { Dashboard } from '../components/features/dashboard';
 import { SubscriptionsTab } from '../components/features/subscriptions';
-import { EmailsTab } from '../components/features/emails';
-import { AnalyticsTab } from '../components/features/analytics';
 
-// Content switcher with all new tabs
+// Simple content switcher - doar cu ce există
 function AppContent() {
   const { state } = useApp();
   const { activeTab } = state.ui;
@@ -21,9 +19,19 @@ function AppContent() {
       case 'subscriptions':
         return <SubscriptionsTab />;
       case 'emails':
-        return <EmailsTab />;
+        return (
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h2 className="text-2xl font-bold mb-4">Email Cleanup</h2>
+            <p>Email management coming soon in next phase!</p>
+          </div>
+        );
       case 'analytics':
-        return <AnalyticsTab />;
+        return (
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h2 className="text-2xl font-bold mb-4">Analytics</h2>
+            <p>Advanced analytics coming soon in next phase!</p>
+          </div>
+        );
       default:
         return <Dashboard />;
     }
@@ -42,16 +50,12 @@ function CleanSlateApp() {
   return (
     <>
       <Head>
-        <title>CleanSlate v3 - AI-Powered Digital Life Optimization</title>
-        <meta name="description" content="Advanced subscription management, email cleanup, and AI-powered insights for digital decluttering." />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        <title>CleanSlate v3 - Digital Life Decluttering</title>
+        <meta name="description" content="Modular subscription and email management with smart analytics." />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#3b82f6" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="CleanSlate v3" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/icons/icon-192x192.png" />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
       </Head>
 
       <ErrorBoundary>
