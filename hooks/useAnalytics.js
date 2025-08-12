@@ -1,36 +1,13 @@
-import { useMemo } from 'react';
-import { useApp } from '../context';
-import { analyticsCalculator } from '../services';
-import { formatCurrency, formatPercentage } from '../utils';
+import { useCallback } from 'react';
 
-export function useAnalytics() {
-  const { state } = useApp();
-  const { subscriptions, emails, user } = state;
+export default function useAnalytics() {
+  const trackEvent = useCallback((name, payload = {}) => {
+    if (process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
+      console.log('[analytics]', name, payload);
+    }
+    // no-op: integrate your real analytics here
+  }, []);
 
-  const analytics = useMemo(() => {
-    const subscriptionMetrics = analyticsCalculator.calculateSubscriptionMetrics(subscriptions);
-    const financialMetrics = analyticsCalculator.calculateFinancialMetrics(subscriptions);
-    const emailMetrics = analyticsCalculator.calculateEmailMetrics(emails);
-    const goalMetrics = analyticsCalculator.calculateGoalMetrics(user);
-    
-    const allMetrics = {
-      subscriptions: subscriptionMetrics,
-      financial: financialMetrics,
-      emails: emailMetrics,
-      goals: goalMetrics
-    };
-    
-    const trends = analyticsCalculator.calculateTrends(allMetrics);
-
-    return {
-      ...allMetrics,
-      trends
-    };
-  }, [subscriptions, emails, user]);
-
-  return {
-    analytics,
-    formatCurrency,
-    formatPercentage
-  };
+  return { trackEvent };
 }
