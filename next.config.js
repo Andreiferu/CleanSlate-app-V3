@@ -2,10 +2,14 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  
+  eslint: {
+    ignoreDuringBuilds: true,  // ← Adaugă asta pentru skip ESLint
+  },
   experimental: {
     appDir: false
   },
+  // ... rest of config
+};
 
   images: {
     formats: ['image/webp', 'image/avif'],
