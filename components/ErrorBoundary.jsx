@@ -129,7 +129,7 @@ Please describe what you were doing when this error occurred:
               </h1>
               
               <p id="error-description" className="text-gray-600 mb-6">
-                We're sorry, but something unexpected happened. You can try refreshing the page 
+               We&apos;re sorry, but something unexpected happened. You can try refreshing the page 
                 or contact our support team if the problem continues.
               </p>
 
