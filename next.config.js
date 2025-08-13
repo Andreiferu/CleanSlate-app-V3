@@ -1,102 +1,79 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // React configuration
-  reactStrictMode: false, // DISABLED pentru a preveni double rendering warnings
+  // React configuration - CRITICAL pentru Next.js 14.2
+  reactStrictMode: false,
   
-  // Compiler options
+  // SWC Minification
   swcMinify: true,
   
-  // Build optimizations
-  productionBrowserSourceMaps: false,
-  generateEtags: false,
-  poweredByHeader: false,
+  // Experimental features pentru stabilitate
+  experimental: {
+    // Disable app directory pentru compatibilitate
+    appDir: false,
+    
+    // Optimizari pentru Vercel
+    optimizePackageImports: ['lucide-react'],
+    
+    // Disable problematic features
+    serverComponentsExternalPackages: [],
+  },
   
-  // Compiler configuration
+  // Compiler optimizations
   compiler: {
-    // Remove console.logs în production
+    // Remove console în production dar păstrează error/warn
     removeConsole: process.env.NODE_ENV === 'production' ? {
       exclude: ['error', 'warn']
     } : false,
-    
-    // React optimizations
-    reactRemoveProperties: process.env.NODE_ENV === 'production',
   },
   
-  // ESLint configuration
-  eslint: {
-    ignoreDuringBuilds: true, // Ignore pentru build rapid
-  },
-  
-  // TypeScript configuration
-  typescript: {
-    ignoreBuildErrors: true, // Ignore pentru build rapid
-  },
-  
-  // Webpack configuration
+  // Webpack configuration pentru framework fixes
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
-    // Optimizări pentru production
-    if (!dev) {
-      // Reduce bundle size
-      config.optimization = {
-        ...config.optimization,
-        usedExports: true,
-        sideEffects: false,
+    // Fix pentru Next.js Link component errors
+    if (!dev && !isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
       };
       
-      // Prevent errors from breaking the build
-      config.stats = 'errors-only';
-      
-      // Suppress specific warnings
+      // Suppress specific warnings that cause React errors
       config.ignoreWarnings = [
-        /Module not found/,
-        /Can't resolve/,
+        { module: /node_modules\/next\// },
+        { file: /node_modules\/next\// },
         /Critical dependency/,
       ];
+      
+      // Optimize chunks pentru a preveni framework errors
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            default: false,
+            vendors: false,
+            // Separate framework chunk
+            framework: {
+              chunks: 'all',
+              name: 'framework',
+              test: /(?<!node_modules.*)[\\/]node_modules[\\/](react|react-dom|next)[\\/]/,
+              priority: 40,
+              enforce: true,
+            },
+          },
+        },
+      };
     }
-    
-    // Alias pentru paths
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      '@': __dirname,
-    };
     
     return config;
   },
   
-  // Environment variables
-  env: {
-    CUSTOM_KEY: 'my-value',
-    PWA_NAME: 'CleanSlate v3',
-    PWA_SHORT_NAME: 'CleanSlate',
-    PWA_DESCRIPTION: 'Digital Life Decluttering Platform',
-    PWA_THEME_COLOR: '#2563eb',
-    PWA_BACKGROUND_COLOR: '#f8f9fa',
-  },
-  
-  // Images configuration
-  images: {
-    formats: ['image/webp'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    domains: [],
-    minimumCacheTTL: 60,
-    dangerouslyAllowSVG: true,
-  },
-  
-  // Headers optimizate
+  // Headers pentru a preveni cache issues
   async headers() {
     return [
       {
-        source: '/(.*)',
+        source: '/_next/static/:path*',
         headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
@@ -126,56 +103,20 @@ const nextConfig = {
     ];
   },
   
-  // Experimental features
-  experimental: {
-    // Optimizează CSS loading
-    optimizeCss: true,
-    
-    // Modern build target
-    modern: true,
-    
-    // Server components (dacă vrei să încerci)
-    serverComponents: false, // DISABLED pentru stabilitate
-    
-    // Concurrent features
-    concurrentFeatures: false, // DISABLED pentru stabilitate
-    
-    // Scroll restoration
-    scrollRestoration: true,
-  },
-  
-  // Compression
+  // Build optimizations
+  productionBrowserSourceMaps: false,
+  poweredByHeader: false,
+  generateEtags: false,
   compress: true,
   
-  // Trailing slash
-  trailingSlash: false,
-  
-  // Output configuration pentru Vercel
-  output: 'standalone',
-  
-  // On-demand entries
-  onDemandEntries: {
-    maxInactiveAge: 25 * 1000,
-    pagesBufferLength: 2,
+  // Environment variables
+  env: {
+    PWA_NAME: 'CleanSlate v3',
+    PWA_SHORT_NAME: 'CleanSlate',
+    PWA_DESCRIPTION: 'Digital Life Decluttering Platform',
+    PWA_THEME_COLOR: '#2563eb',
+    PWA_BACKGROUND_COLOR: '#f8f9fa',
   },
-  
-  // Disable x-powered-by header
-  poweredByHeader: false,
-  
-  // Custom page extensions
-  pageExtensions: ['jsx', 'js', 'ts', 'tsx'],
-  
-  // Asset prefix for CDN
-  // assetPrefix: process.env.NODE_ENV === 'production' ? '' : '',
-  
-  // Base path
-  // basePath: '',
-  
-  // i18n configuration (dacă ai nevoie)
-  // i18n: {
-  //   locales: ['en'],
-  //   defaultLocale: 'en',
-  // },
 };
 
 module.exports = nextConfig;
