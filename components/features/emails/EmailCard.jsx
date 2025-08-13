@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Mail, Clock, Trash2, RotateCcw, Archive } from 'lucide-react';
+import { ChevronDown, ChevronUp, Mail, Clock, Trash2, Archive, RotateCcw, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Button } from '../../ui';
 
 const EmailCard = React.memo(({ 
@@ -28,10 +28,19 @@ const EmailCard = React.memo(({
   const getImportanceIcon = () => {
     const iconProps = { className: "h-4 w-4", 'aria-hidden': true };
     switch (email.importance) {
-      case 'high': return <Mail {...iconProps} className={`${iconProps.className} text-green-500`} />;
+      case 'high': return <CheckCircle {...iconProps} className={`${iconProps.className} text-green-500`} />;
       case 'medium': return <Clock {...iconProps} className={`${iconProps.className} text-yellow-500`} />;
-      case 'low': return <Trash2 {...iconProps} className={`${iconProps.className} text-red-500`} />;
+      case 'low': return <AlertTriangle {...iconProps} className={`${iconProps.className} text-red-500`} />;
       default: return <Mail {...iconProps} className={`${iconProps.className} text-gray-400`} />;
+    }
+  };
+
+  const getTypeIcon = () => {
+    switch (email.type) {
+      case 'newsletter': return '📰';
+      case 'promotional': return '🛍️';
+      case 'notification': return '🔔';
+      default: return '📧';
     }
   };
 
@@ -58,12 +67,19 @@ const EmailCard = React.memo(({
   };
 
   const formatTime = (minutes) => {
-    if (minutes < 60) {
-      return `${minutes.toFixed(1)} min`;
-    }
+    if (minutes < 60) return `${minutes.toFixed(1)} min`;
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
     return remainingMinutes > 0 ? `${hours}h ${remainingMinutes.toFixed(0)}m` : `${hours}h`;
+  };
+
+  const getFrequencyBadge = () => {
+    const colors = {
+      daily: 'bg-red-100 text-red-800',
+      weekly: 'bg-yellow-100 text-yellow-800',
+      monthly: 'bg-green-100 text-green-800'
+    };
+    return colors[email.frequency] || 'bg-gray-100 text-gray-800';
   };
 
   return (
@@ -73,10 +89,13 @@ const EmailCard = React.memo(({
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3 sm:space-x-4 min-w-0 flex-1">
-          <div className="text-2xl sm:text-3xl bg-white p-2 rounded-xl shadow-sm flex-shrink-0" 
+          <div className="text-2xl sm:text-3xl bg-white p-2 rounded-xl shadow-sm flex-shrink-0 relative" 
                role="img" 
                aria-label={`${email.sender} logo`}>
             {email.logo}
+            <div className="absolute -top-1 -right-1 text-sm">
+              {getTypeIcon()}
+            </div>
           </div>
           <div className="min-w-0 flex-1">
             <h3 className="font-bold text-gray-900 text-base sm:text-lg truncate">
@@ -85,13 +104,16 @@ const EmailCard = React.memo(({
             <p className="text-sm text-gray-600 font-medium truncate">
               {email.category}
             </p>
-            <div className="flex items-center space-x-2 mt-2">
+            <div className="flex items-center space-x-2 mt-2 flex-wrap gap-1">
               {getImportanceIcon()}
               <span className="text-sm capitalize text-gray-700 font-medium">
+                {email.importance}
+              </span>
+              <span className={`text-xs px-2 py-1 rounded-full font-medium ${getFrequencyBadge()}`}>
                 {email.frequency}
               </span>
               {email.unsubscribed && (
-                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full font-medium">
                   Unsubscribed
                 </span>
               )}
@@ -107,6 +129,11 @@ const EmailCard = React.memo(({
           <p className="text-xs text-orange-600 font-medium">
             {formatTime(timeWastedWeekly)}
           </p>
+          {email.emailsPerWeek > 7 && (
+            <div className="text-xs text-red-500 font-bold mt-1">
+              ⚠️ High Volume
+            </div>
+          )}
         </div>
       </div>
 
@@ -120,9 +147,21 @@ const EmailCard = React.memo(({
           <span className="font-medium capitalize">{email.importance}</span>
         </div>
         
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 gap-4 mt-3 p-3 bg-white/50 rounded-lg">
+          <div className="text-center">
+            <div className="text-lg font-bold text-blue-600">{Math.round(email.emailsPerWeek * 4.33)}</div>
+            <div className="text-xs text-gray-600">Monthly</div>
+          </div>
+          <div className="text-center">
+            <div className="text-lg font-bold text-purple-600">{email.emailsPerWeek * 52}</div>
+            <div className="text-xs text-gray-600">Yearly</div>
+          </div>
+        </div>
+        
         {showDetails && (
-          <div className="pt-2 border-t border-gray-200" role="region" aria-label="Additional email details">
-            <div className="space-y-2">
+          <div className="pt-4 border-t border-gray-200" role="region" aria-label="Additional email details">
+            <div className="space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Monthly emails:</span>
                 <span className="font-medium">{Math.round(email.emailsPerWeek * 4.33)}</span>
@@ -141,9 +180,29 @@ const EmailCard = React.memo(({
               </div>
               {email.description && (
                 <div className="pt-2">
-                  <p className="text-sm text-gray-600 italic">"{email.description}"</p>
+                  <div className="text-sm text-gray-600 font-medium mb-1">Description:</div>
+                  <p className="text-sm text-gray-700 italic bg-gray-50 p-2 rounded">
+                    "{email.description}"
+                  </p>
                 </div>
               )}
+              
+              {/* Impact Analysis */}
+              <div className="pt-3 border-t border-gray-100">
+                <div className="text-sm text-gray-600 font-medium mb-2">📊 Impact Analysis</div>
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div className="bg-blue-50 p-2 rounded">
+                    <div className="font-medium text-blue-800">Time Impact</div>
+                    <div className="text-blue-600">{timeWastedWeekly > 10 ? 'High' : timeWastedWeekly > 5 ? 'Medium' : 'Low'}</div>
+                  </div>
+                  <div className="bg-purple-50 p-2 rounded">
+                    <div className="font-medium text-purple-800">Priority Score</div>
+                    <div className="text-purple-600">
+                      {email.importance === 'low' && email.emailsPerWeek > 5 ? 'Unsubscribe' : 'Keep'}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
