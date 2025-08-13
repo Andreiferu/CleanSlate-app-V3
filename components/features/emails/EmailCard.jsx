@@ -84,3 +84,126 @@ const EmailCard = React.memo(({
             </h3>
             <p className="text-sm text-gray-600 font-medium truncate">
               {email.category}
+            </p>
+            <div className="flex items-center space-x-2 mt-2">
+              {getImportanceIcon()}
+              <span className="text-sm capitalize text-gray-700 font-medium">
+                {email.frequency}
+              </span>
+              {email.unsubscribed && (
+                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                  Unsubscribed
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+        
+        <div className="text-right flex-shrink-0 ml-3">
+          <p className="font-bold text-lg sm:text-2xl text-gray-900" aria-label={`${email.emailsPerWeek} emails per week`}>
+            {email.emailsPerWeek}
+          </p>
+          <p className="text-xs text-gray-500 font-medium">emails/week</p>
+          <p className="text-xs text-orange-600 font-medium">
+            {formatTime(timeWastedWeekly)}
+          </p>
+        </div>
+      </div>
+
+      <div className="space-y-2 mb-4">
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-600">Type:</span>
+          <span className="font-medium capitalize">{email.type}</span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-600">Importance:</span>
+          <span className="font-medium capitalize">{email.importance}</span>
+        </div>
+        
+        {showDetails && (
+          <div className="pt-2 border-t border-gray-200" role="region" aria-label="Additional email details">
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Monthly emails:</span>
+                <span className="font-medium">{Math.round(email.emailsPerWeek * 4.33)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Annual emails:</span>
+                <span className="font-medium">{email.emailsPerWeek * 52}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Monthly time wasted:</span>
+                <span className="font-medium text-orange-600">{formatTime(timeWastedMonthly)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Annual time wasted:</span>
+                <span className="font-medium text-red-600">{formatTime(timeWastedAnnually)}</span>
+              </div>
+              {email.description && (
+                <div className="pt-2">
+                  <p className="text-sm text-gray-600 italic">"{email.description}"</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowDetails(!showDetails)}
+          className="text-blue-600 hover:text-blue-800 flex items-center justify-center sm:justify-start space-x-1"
+          aria-expanded={showDetails}
+        >
+          {showDetails ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          <span>{showDetails ? 'Less details' : 'More details'}</span>
+        </Button>
+        
+        <div className="flex space-x-2" role="group" aria-label="Email actions">
+          {!email.unsubscribed ? (
+            <>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => handleAction('archive')}
+                disabled={isLoading}
+                aria-label={`Archive ${email.sender} emails`}
+              >
+                <Archive className="h-4 w-4 mr-1" aria-hidden="true" />
+                {isLoading ? 'Processing...' : 'Archive'}
+              </Button>
+              
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={() => handleAction('unsubscribe')}
+                disabled={isLoading}
+                aria-label={`Unsubscribe from ${email.sender}`}
+              >
+                <Trash2 className="h-4 w-4 mr-1" aria-hidden="true" />
+                {isLoading ? 'Unsubscribing...' : 'Unsubscribe'}
+              </Button>
+            </>
+          ) : (
+            <Button
+              variant="success"
+              size="sm"
+              onClick={() => handleAction('resubscribe')}
+              disabled={isLoading}
+              aria-label={`Resubscribe to ${email.sender}`}
+            >
+              <RotateCcw className="h-4 w-4 mr-1" aria-hidden="true" />
+              {isLoading ? 'Resubscribing...' : 'Resubscribe'}
+            </Button>
+          )}
+        </div>
+      </div>
+    </article>
+  );
+});
+
+EmailCard.displayName = 'EmailCard';
+
+export default EmailCard;
