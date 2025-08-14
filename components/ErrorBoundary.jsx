@@ -47,7 +47,7 @@ export default class ErrorBoundary extends Component {
             <div className="text-center mb-6">
               <div className="text-6xl mb-4 animate-bounce">😵</div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Oops!</h2>
-              <p className="text-gray-600">Something went wrong, but don't worry!</p>
+              <p className="text-gray-600">Something went wrong, but don&apos;t worry!</p>
             </div>
             
             <div className="space-y-4">
