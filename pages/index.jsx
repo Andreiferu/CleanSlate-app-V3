@@ -1,4 +1,5 @@
 // pages/index.jsx - COMPLET ACTUALIZAT
+import InstallPWA from '../components/pwa/InstallPWA';
 import React from 'react';
 import { AppProvider } from '../context';
 import { Header, Navigation } from '../components/layout';
